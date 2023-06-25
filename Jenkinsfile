@@ -1,7 +1,7 @@
 pipeline {
     agent {
         kubernetes {
-            defaultContainer 'kaniko'
+            defaultContainer 'node'
             yaml '''
 kind: Pod
 spec:
@@ -57,17 +57,17 @@ spec:
     stages {
         stage('SCM Checkout') {
             steps {
-                checkout scmGit(branches: [[name: '**']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/4m3ndy/simple-webapp-nodejs']])
+              checkout scmGit(branches: [[name: '**']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/4m3ndy/simple-webapp-nodejs']])
             }
         }
 
         stage('Test') {
-            steps {
-                container('node') {
-                    sh "npm install"
-                    sh "npm run test"
-                }
+          steps {
+            container('node') {
+              sh "npm install"
+              sh "npm run test"
             }
+          }
         }
 
         stage('Build'){
@@ -84,7 +84,7 @@ spec:
           }
           steps {
             container('kaniko') {
-                sh "/kaniko/executor -c `pwd` --dockerfile=Dockerfile --cache=true --destination=4m3ndy/sample-webapp-nodejs:${GIT_COMMIT[0..7]}"
+                sh "/kaniko/executor -c `pwd` --dockerfile=Dockerfile --destination=4m3ndy/sample-webapp-nodejs:${GIT_COMMIT[0..7]}"
             }
           }
         }
