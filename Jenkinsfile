@@ -79,22 +79,26 @@ spec:
         }
 
         stage('Push'){
-          when (BRANCH_NAME == 'master') {
+          if (env.BRANCH_NAME == 'master') {
             steps {
               container('kaniko') {
-                  sh "/kaniko/executor -c `pwd` --dockerfile=Dockerfile --cache=true --destination=4m3ndy/sample-webapp-nodejs:${GIT_COMMIT[0..7]}"
+                sh "/kaniko/executor -c `pwd` --dockerfile=Dockerfile --destination=4m3ndy/sample-webapp-nodejs:${GIT_COMMIT[0..7]}"
               }
             }
+          } else {
+              echo 'Skip Deploying as non-master branch'
           }
         }
 
         stage('Deploy'){
-          when (BRANCH_NAME == 'master') {
+          if (env.BRANCH_NAME == 'master') {
             steps {
               container('kubectl') {
-                  sh "kubectl apply -R -f ./kubernetes"
+                sh "kubectl apply -R -f ./kubernetes"
               }
             }
+          } else {
+              echo 'Skip Deploying as non-master branch'
           }
         }
     }
