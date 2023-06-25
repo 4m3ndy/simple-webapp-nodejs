@@ -15,13 +15,6 @@ spec:
     - sleep
     args:
     - 99d
-  - name: git
-    image: bitnami/git:2.31.0-debian-10-r2
-    imagePullPolicy: Always
-    command:
-    - sleep
-    args:
-    - 99d
   - name: kubectl
     image: portainer/kubectl-shell:latest-v1.21.1-amd64
     imagePullPolicy: Always
@@ -67,13 +60,6 @@ spec:
         stage('SCM Checkout') {
             steps {
               checkout scmGit(branches: [[name: '**']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/4m3ndy/simple-webapp-nodejs']])
-              container('git') {
-                script {
-                  GIT_BRANCH = sh(returnStdout: true, script: 'git symbolic-ref --short HEAD').trim()
-                  echo GIT_BRANCH
-                  echo BRANCH
-                }
-              }
             }
         }
 
@@ -96,9 +82,7 @@ spec:
 
         stage('Push'){
           when {
-            expression {
-                return GIT_BRANCH == 'master' || params.FORCE_FULL_BUILD
-            }
+            branch 'master'
           }
           steps {
             container('kaniko') {
@@ -109,9 +93,7 @@ spec:
 
         stage('Deploy'){
           when {
-            expression {
-                return GIT_BRANCH == 'master' || params.FORCE_FULL_BUILD
-            }
+            branch 'master'
           }
           steps {
             container('kubectl') {
