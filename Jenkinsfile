@@ -1,3 +1,5 @@
+def GIT_BRANCH
+
 pipeline {
     agent {
         kubernetes {
@@ -8,6 +10,13 @@ spec:
   containers:
   - name: node
     image: node:18.16.1-bullseye-slim
+    imagePullPolicy: Always
+    command:
+    - sleep
+    args:
+    - 99d
+  - name: git
+    image: bitnami/git:2.31.0-debian-10-r2
     imagePullPolicy: Always
     command:
     - sleep
@@ -57,17 +66,24 @@ spec:
     stages {
         stage('SCM Checkout') {
             steps {
-                checkout scmGit(branches: [[name: '**']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/4m3ndy/simple-webapp-nodejs']])
+              checkout scmGit(branches: [[name: '**']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/4m3ndy/simple-webapp-nodejs']])
+              container('git') {
+                script {
+                  GIT_BRANCH = sh(returnStdout: true, script: 'git symbolic-ref --short HEAD').trim()
+                  echo GIT_BRANCH
+                  echo BRANCH
+                }
+              }
             }
         }
 
         stage('Test') {
-            steps {
-                container('node') {
-                    sh "npm install"
-                    sh "npm run test"
-                }
+          steps {
+            container('node') {
+              sh "npm install"
+              sh "npm run test"
             }
+          }
         }
 
         stage('Build'){
@@ -81,8 +97,7 @@ spec:
         stage('Push'){
           when {
             expression {
-                GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
-                return GIT_BRANCH == 'origin/master' || params.FORCE_FULL_BUILD
+                return GIT_BRANCH == 'master' || params.FORCE_FULL_BUILD
             }
           }
           steps {
@@ -95,8 +110,7 @@ spec:
         stage('Deploy'){
           when {
             expression {
-                GIT_BRANCH = 'origin/' + sh(returnStdout: true, script: 'git rev-parse --abbrev-ref HEAD').trim()
-                return GIT_BRANCH == 'origin/master' || params.FORCE_FULL_BUILD
+                return GIT_BRANCH == 'master' || params.FORCE_FULL_BUILD
             }
           }
           steps {
