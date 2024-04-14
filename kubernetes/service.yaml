@@ -14,4 +14,4 @@ spec:
     targetPort: 3000
   selector:
     app: sample-webapp-nodejs
-  type: ClusterIP
+  type: LoadBalancer
