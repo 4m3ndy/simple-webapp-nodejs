@@ -19,7 +19,7 @@ spec:
         app: sample-webapp-nodejs
     spec:
       containers:
-      - image: 4m3ndy/sample-webapp-nodejs:d1dc4fe6
+      - image: 4m3ndy/webapp-nodejs:IMAGE_TAG
         name: sample-webapp-nodejs
         resources: {}
 
