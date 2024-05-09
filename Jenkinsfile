@@ -89,16 +89,16 @@ spec:
           }
         }
 
-        stage('Deploy'){
-          when {
-            branch 'master'
-          }
-          steps {
-            container('kubectl') {
-                sh "kubectl apply -R -f ./kubernetes"
-                sh "kubectl -n jenkins rollout status deployment/sample-webapp-nodejs"
-            }
-          }
-        }
+        // stage('Deploy'){
+        //   when {
+        //     branch 'master'
+        //   }
+        //   steps {
+        //     container('kubectl') {
+        //         sh "kubectl apply -R -f ./kubernetes"
+        //         sh "kubectl -n jenkins rollout status deployment/sample-webapp-nodejs"
+        //     }
+        //   }
+        // }
     }
 }
