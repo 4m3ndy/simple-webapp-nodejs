@@ -96,6 +96,7 @@ spec:
           steps {
             container('kubectl') {
                 sh "kubectl apply -R -f ./kubernetes"
+                sh "kubectl rollout status deployment/sample-webapp-nodejs"
             }
           }
         }
