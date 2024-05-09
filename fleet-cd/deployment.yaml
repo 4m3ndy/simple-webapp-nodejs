@@ -26,7 +26,9 @@ spec:
         app: sample-webapp-nodejs
     spec:
       containers:
-      - image: 4m3ndy/webapp-nodejs:bd930954
+      - image: 4m3ndy/sample-webapp-nodejs:bd930954
         name: sample-webapp-nodejs
         resources: {}
+      imagePullSecrets:
+        - name: regcred
 
